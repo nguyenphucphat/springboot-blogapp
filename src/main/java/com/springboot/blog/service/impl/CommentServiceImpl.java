@@ -10,6 +10,7 @@ import com.springboot.blog.repository.CommentRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.CommentService;
 import com.springboot.blog.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,23 +23,32 @@ import java.util.Set;
 public class CommentServiceImpl implements CommentService {
 
     private PostService postService;
+    private ModelMapper mapper;
 
     private PostRepository postRepository;
     private CommentRepository commentRepository;
 
     @Autowired
-    public CommentServiceImpl(PostService postService, PostRepository postRepository, CommentRepository commentRepository) {
+    public CommentServiceImpl(PostService postService, PostRepository postRepository, CommentRepository commentRepository
+    ,ModelMapper mapper) {
         this.postService = postService;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.mapper = mapper;
     }
 
     @Override
     public CommentDto create(Long postId, CommentDto commentDto) {
         throwPostNotExist(postId);
-        throwCommentExist(commentDto.getId());
+        Post post = postRepository.findById(postId).get();
+
+        if(commentDto.getId() != null)
+        {
+            throw new BadRequestException("Id is not allowed in creating new comment");
+        }
 
         Comment comment = convertToEntity(postId, commentDto);
+        comment.setPost(post);
 
         Comment savedComment = commentRepository.save(comment);
 
@@ -114,28 +124,28 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto convertToDto(Comment comment) {
-        CommentDto commentDto = new CommentDto();
+        CommentDto commentDto = mapper.map(comment, CommentDto.class);
 
-        commentDto.setId(comment.getId());
-        commentDto.setName(comment.getName());
-        commentDto.setEmail(comment.getEmail());
-        commentDto.setBody(comment.getBody());
+//        commentDto.setId(comment.getId());
+//        commentDto.setName(comment.getName());
+//        commentDto.setEmail(comment.getEmail());
+//        commentDto.setBody(comment.getBody());
 
         return commentDto;
     }
 
     @Override
     public Comment convertToEntity(Long postId, CommentDto commentDto) {
-        Comment comment = new Comment();
+        Comment comment = mapper.map(commentDto, Comment.class);
 
-        comment.setId(commentDto.getId());
-        comment.setName(commentDto.getName());
-        comment.setEmail(commentDto.getEmail());
-        comment.setBody(commentDto.getBody());
-
-        Optional<Post> post = postRepository.findById(postId);
-
-        comment.setPost(post.get());
+//        comment.setId(commentDto.getId());
+//        comment.setName(commentDto.getName());
+//        comment.setEmail(commentDto.getEmail());
+//        comment.setBody(commentDto.getBody());
+//
+//        Optional<Post> post = postRepository.findById(postId);
+//
+//        comment.setPost(post.get());
 
         return comment;
     }
