@@ -4,6 +4,7 @@ import com.springboot.blog.payload.ApiRespone;
 import com.springboot.blog.payload.CommentDto;
 import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.utils.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -55,14 +56,14 @@ public class CommentController {
     }
 
     @PostMapping("posts/{postId}/comments")
-    public ResponseEntity<ApiRespone> createComment(@PathVariable(name="postId") long postId, @RequestBody CommentDto commentDto) {
+    public ResponseEntity<ApiRespone> createComment(@PathVariable(name="postId") long postId,@Valid @RequestBody CommentDto commentDto) {
         CommentDto data = commentService.create(postId, commentDto);
         ApiRespone response = new ApiRespone(true, "success", (Object) data);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("posts/{postId}/comments/{id}")
-    public ResponseEntity<ApiRespone> updateComment(@PathVariable(name="postId") long postId, @PathVariable(name="id") long id, @RequestBody CommentDto commentDto) {
+    public ResponseEntity<ApiRespone> updateComment(@PathVariable(name="postId") long postId, @PathVariable(name="id") long id,@Valid @RequestBody CommentDto commentDto) {
         CommentDto data = commentService.update(postId, id, commentDto);
         ApiRespone response = new ApiRespone(true, "success", (Object) data);
         return ResponseEntity.ok(response);

@@ -7,6 +7,7 @@ import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +63,7 @@ public class PostController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> createPost(@RequestBody PostDto postDto, WebRequest request) {
+    public ResponseEntity<?> createPost(@Valid @RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
 
         PostDto data = postService.create(postDto);
@@ -73,7 +74,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@RequestBody PostDto postDto, WebRequest request) {
+    public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@Valid @RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
 
         PostDto data = postService.update(postDto, id);
