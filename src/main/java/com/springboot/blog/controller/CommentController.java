@@ -5,10 +5,12 @@ import com.springboot.blog.payload.CommentDto;
 import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.utils.AppConstants;
 import jakarta.validation.Valid;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.springboot.blog.service.CommentService;
 
@@ -55,6 +57,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("posts/{postId}/comments")
     public ResponseEntity<ApiRespone> createComment(@PathVariable(name="postId") long postId,@Valid @RequestBody CommentDto commentDto) {
         CommentDto data = commentService.create(postId, commentDto);
@@ -62,6 +65,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("posts/{postId}/comments/{id}")
     public ResponseEntity<ApiRespone> updateComment(@PathVariable(name="postId") long postId, @PathVariable(name="id") long id,@Valid @RequestBody CommentDto commentDto) {
         CommentDto data = commentService.update(postId, id, commentDto);
@@ -69,6 +73,7 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("posts/{postId}/comments/{id}")
     public ResponseEntity<ApiRespone> deleteComment(@PathVariable(name="postId") long postId, @PathVariable(name="id") long id) {
         commentService.delete(postId, id);

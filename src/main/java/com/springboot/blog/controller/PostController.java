@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
@@ -62,6 +63,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/")
     public ResponseEntity<?> createPost(@Valid @RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
@@ -73,6 +75,7 @@ public class PostController {
         return response;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@Valid @RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
@@ -84,6 +87,7 @@ public class PostController {
         return response;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable(name="id") long id) {
         postService.deleteById(id);
