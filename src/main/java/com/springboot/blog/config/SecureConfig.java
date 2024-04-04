@@ -33,6 +33,7 @@ public class SecureConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
@@ -41,6 +42,7 @@ public class SecureConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize.requestMatchers(HttpMethod.GET,"/api/**").permitAll()
+                                                                .requestMatchers("/api/auth/**").permitAll()
                                                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
