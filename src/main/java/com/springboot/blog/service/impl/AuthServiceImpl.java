@@ -7,6 +7,7 @@ import com.springboot.blog.payload.LoginDto;
 import com.springboot.blog.payload.RegisterDto;
 import com.springboot.blog.repository.RoleRepository;
 import com.springboot.blog.repository.UserRepository;
+import com.springboot.blog.security.JwtTokenProvider;
 import com.springboot.blog.service.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,11 +26,14 @@ public class AuthServiceImpl implements AuthService {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository,RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    private JwtTokenProvider jwtTokenProvider;
+
+    public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -38,7 +42,9 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticate);
 
-        return "Login Success";
+        String token = jwtTokenProvider.generateToken(authenticate);
+
+        return token;
     }
 
     @Override
