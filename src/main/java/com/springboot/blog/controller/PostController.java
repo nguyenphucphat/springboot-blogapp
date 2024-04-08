@@ -56,6 +56,13 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/category/{id}")
+    public ResponseEntity<ApiRespone> getAllPostsByCategoryId(@PathVariable(name="id") long categoryId) {
+        List<PostDto> data = postService.findAllByCategoryId(categoryId);
+        ApiRespone response = new ApiRespone(true, "success", (Object) data);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiRespone> getPostById(@PathVariable(name="id") long id) {
         PostDto data = postService.findById(id);
@@ -77,7 +84,7 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@Valid @RequestBody PostDto postDto, WebRequest request) {
+    public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
 
         PostDto data = postService.update(postDto, id);

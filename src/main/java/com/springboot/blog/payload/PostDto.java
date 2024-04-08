@@ -18,4 +18,5 @@ public class PostDto {
     @NotEmpty(message = "Content is required")
     private String content;
     private Set<CommentDto> comments;
+    private Long categoryId;
 }

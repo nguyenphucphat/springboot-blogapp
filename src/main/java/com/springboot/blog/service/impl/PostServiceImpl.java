@@ -5,6 +5,7 @@ import com.springboot.blog.exception.BadRequestException;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.payload.PostDto;
+import com.springboot.blog.repository.CategoryRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import org.modelmapper.ModelMapper;
@@ -19,11 +20,15 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     PostRepository postRepository;
+    CategoryRepository categoryRepository;
     ModelMapper mapper;
 
-    public PostServiceImpl(PostRepository postRepository, ModelMapper mapper) {
+    public PostServiceImpl(PostRepository postRepository,
+                           ModelMapper mapper,
+                           CategoryRepository categoryRepository) {
         this.mapper = mapper;
         this.postRepository = postRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -43,6 +48,19 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostDto> findAllByCategoryId(long categoryId) {
+        if(!categoryRepository.existsById(categoryId))
+        {
+            throw new ResourceNotFoundException("Category", "id", Long.toString(categoryId));
+        }
+
+        List<Post> posts = postRepository.findAllByCategoryId(categoryId);
+        List<PostDto> result = posts.stream().map(this::convertToDto).collect(Collectors.toList());
+
+        return result;
+    }
+
+    @Override
     public PostDto findById(long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("Post", "id", Long.toString(id));
@@ -57,6 +75,11 @@ public class PostServiceImpl implements PostService {
             throw new BadRequestException("Id is not allowed in creating new post");
         }
 
+        if(!categoryRepository.existsById(postDto.getCategoryId()))
+        {
+            throw new ResourceNotFoundException("Category", "id", Long.toString(postDto.getCategoryId()));
+        }
+
         Post post = convertToEntity(postDto);
         Post savedPost = postRepository.save(post);
         return convertToDto(savedPost);
@@ -64,15 +87,24 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto update(PostDto postDto, long id) {
-        Post post = convertToEntity(postDto);
 
-        if(post.getId() != null){
+        if(postDto.getId() != null){
             throw new BadRequestException("Id is not allowed in updating post");
         }
 
         Post existingPost = postRepository.findById(id).orElseThrow(() -> {
             return new ResourceNotFoundException("Post", "id", Long.toString(id));
         });
+
+        if(postDto.getCategoryId() != null && !categoryRepository.existsById(postDto.getCategoryId()))
+        {
+            throw new ResourceNotFoundException("Category", "id", Long.toString(postDto.getCategoryId()));
+        }
+        else{
+            existingPost.setCategory(categoryRepository.findById(postDto.getCategoryId()).get());
+        }
+
+        Post post = convertToEntity(postDto);
 
         // update with fields not null
         if(post.getTitle() != null)

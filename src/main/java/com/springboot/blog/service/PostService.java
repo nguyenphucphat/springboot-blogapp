@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface PostService {
     DataGetAllRespone findAll(Pageable pageable);
+    List<PostDto> findAllByCategoryId(long categoryId);
     PostDto findById(long id);
 
     PostDto create(PostDto postDto);
