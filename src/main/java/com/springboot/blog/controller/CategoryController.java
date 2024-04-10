@@ -5,6 +5,8 @@ import com.springboot.blog.payload.CategoryDto;
 import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.service.CategoryService;
 import com.springboot.blog.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/categories/")
+@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
     private CategoryService categoryService;
 
@@ -23,6 +26,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @Operation(summary = "Get all categories")
     @GetMapping()
     public ResponseEntity<ApiRespone> getAllCategories(
             @RequestParam(name = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
@@ -47,7 +51,8 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @Operation(summary = "Get category by id")
+    @GetMapping("{id}/")
     public ResponseEntity<ApiRespone> getCategoryById(@PathVariable(name = "id") Long id) {
         CategoryDto category = categoryService.findById(id);
         ApiRespone response = new ApiRespone(true, "success", (Object) category);
@@ -55,6 +60,7 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Create category")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping()
     public ResponseEntity<ApiRespone> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
@@ -66,8 +72,9 @@ public class CategoryController {
         return responseEntity;
     }
 
+    @Operation(summary = "Update category")
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping("{id}/")
     public ResponseEntity<ApiRespone> updateCategory(@RequestBody CategoryDto categoryDto, @PathVariable(name = "id") Long id) {
         CategoryDto category = categoryService.update(categoryDto, id);
         ApiRespone response = new ApiRespone(true, "success", (Object) category);
@@ -75,8 +82,9 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Delete category")
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}/")
     public ResponseEntity<Void> deleteCategory(@PathVariable(name = "id") Long id) {
         categoryService.deleteById(id);
 

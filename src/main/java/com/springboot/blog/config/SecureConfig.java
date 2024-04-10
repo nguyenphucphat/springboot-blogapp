@@ -2,6 +2,8 @@ package com.springboot.blog.config;
 
 import com.springboot.blog.security.JwtAuthenticationEntryPoint;
 import com.springboot.blog.security.JwtAuthenticationFilter;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableMethodSecurity
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+)
 public class SecureConfig {
 
     private UserDetailsService userDetailsService;
@@ -44,11 +52,12 @@ public class SecureConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable())
-                .authorizeHttpRequests((authorize) -> authorize
-                                                                .requestMatchers("/api/auth/**").permitAll()
-                                                                .requestMatchers("/api/users/**").hasRole("ADMIN")
-                                                                .requestMatchers( "/api/**").hasRole("USER")
-                                                                .anyRequest().authenticated())
+                .authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers( "/api/**").hasRole("USER")
+                        .anyRequest().authenticated())
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

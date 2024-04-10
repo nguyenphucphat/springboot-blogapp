@@ -1,12 +1,12 @@
 package com.springboot.blog.controller;
 
-import com.springboot.blog.entity.Post;
-import com.springboot.blog.exception.ErrorRespone;
 import com.springboot.blog.payload.ApiRespone;
 import com.springboot.blog.payload.DataGetAllRespone;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +18,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api/posts/")
+@SecurityRequirement(name = "bearerAuth")
 public class PostController {
 
     private PostService postService;
@@ -33,6 +32,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    @Operation(summary = "Get all posts")
     @GetMapping()
     public ResponseEntity<ApiRespone> getAllPosts(
             @RequestParam(name = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int page,
@@ -56,22 +56,25 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/category/{id}")
+    @Operation(summary = "Get all posts by category id")
+    @GetMapping("category/{id}/")
     public ResponseEntity<ApiRespone> getAllPostsByCategoryId(@PathVariable(name="id") long categoryId) {
         List<PostDto> data = postService.findAllByCategoryId(categoryId);
         ApiRespone response = new ApiRespone(true, "success", (Object) data);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @Operation(summary = "Get post by id")
+    @GetMapping("{id}/")
     public ResponseEntity<ApiRespone> getPostById(@PathVariable(name="id") long id) {
         PostDto data = postService.findById(id);
         ApiRespone response = new ApiRespone(true, "success", (Object) data);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Create post")
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createPost(@Valid @RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
 
@@ -82,8 +85,9 @@ public class PostController {
         return response;
     }
 
+    @Operation(summary = "Update post")
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping("{id}/")
     public ResponseEntity<?> updatePost(@PathVariable(name="id") long id,@RequestBody PostDto postDto, WebRequest request) {
         ResponseEntity<?> response;
 
@@ -94,8 +98,9 @@ public class PostController {
         return response;
     }
 
+    @Operation(summary = "Delete post")
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}/")
     public ResponseEntity<Void> deletePost(@PathVariable(name="id") long id) {
         postService.deleteById(id);
         return ResponseEntity.noContent().build();

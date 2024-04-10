@@ -5,8 +5,6 @@ import com.springboot.blog.payload.CommentDto;
 import com.springboot.blog.payload.DataGetAllRespone;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface CommentService {
     CommentDto create(Long postId, CommentDto commentDto);
     CommentDto update(Long postId, Long commentId, CommentDto commentDto);
