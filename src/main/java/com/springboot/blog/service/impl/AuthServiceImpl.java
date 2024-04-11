@@ -17,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import org.javatuples.Pair;
-
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -80,4 +78,5 @@ public class AuthServiceImpl implements AuthService {
     public String refreshAccessToken(String refreshToken) {
         return jwtTokenProvider.refreshAccessToken(refreshToken);
     }
+
 }

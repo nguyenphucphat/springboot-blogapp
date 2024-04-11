@@ -45,6 +45,18 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Logout")
+    @PostMapping(value = {"logout/", "signout/"})
+    public ResponseEntity<String> logout(@CookieValue("accessToken") String accessToken, @CookieValue("refreshToken") String refreshToken){
+
+        HttpHeaders headers = new HttpHeaders();
+//        Set JWT token in response header
+        headers.add(HttpHeaders.SET_COOKIE, "accessToken= " + "; Path=/; Max-Age=" + "0" + "; HttpOnly; SameSite=None; Secure");
+        headers.add(HttpHeaders.SET_COOKIE, "refreshToken= " + "; Path=/; Max-Age=" + "0" + "; HttpOnly; SameSite=None; Secure");
+
+        return ResponseEntity.ok().headers(headers).body("Logout Successfully");
+    }
+
     @Operation(summary = "Refresh Token")
     @PostMapping(value = {"refresh-token/"})
     public ResponseEntity<JwtAuthRespone> refreshToken(@CookieValue("refreshToken") String refreshToken) {
