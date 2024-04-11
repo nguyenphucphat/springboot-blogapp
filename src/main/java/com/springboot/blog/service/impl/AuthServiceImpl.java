@@ -3,6 +3,7 @@ package com.springboot.blog.service.impl;
 import com.springboot.blog.entity.Role;
 import com.springboot.blog.entity.User;
 import com.springboot.blog.exception.BadRequestException;
+import com.springboot.blog.payload.JwtAuthRespone;
 import com.springboot.blog.payload.LoginDto;
 import com.springboot.blog.payload.RegisterDto;
 import com.springboot.blog.repository.RoleRepository;
@@ -15,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import org.javatuples.Pair;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -36,14 +39,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginDto loginDto) {
+    public JwtAuthRespone login(LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authenticate);
 
-        String token = jwtTokenProvider.generateToken(authenticate);
+        String accessToken = jwtTokenProvider.generateAccessToken(authenticate);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(authenticate);
 
-        return token;
+        JwtAuthRespone respone = new JwtAuthRespone(accessToken, refreshToken);
+
+        return respone;
     }
 
     @Override
@@ -68,5 +74,10 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(newUser);
 
         return "User registered successfully";
+    }
+
+    @Override
+    public String refreshAccessToken(String refreshToken) {
+        return jwtTokenProvider.refreshAccessToken(refreshToken);
     }
 }

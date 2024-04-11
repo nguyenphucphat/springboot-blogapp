@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class JwtAuthRespone {
     private String accessToken;
-    private String tokenType = "Bearer";
+    private String refreshToken;
 }
