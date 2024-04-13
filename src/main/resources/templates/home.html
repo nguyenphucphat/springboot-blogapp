@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home Page</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var countdownElement = document.getElementById('countdown');
+            var countdownTime = 5;  // Đặt thời gian bắt đầu là 5 giây
+
+            countdownElement.textContent = countdownTime; // Hiển thị thời gian ban đầu
+
+            var countdownInterval = setInterval(function() {
+                countdownTime--; // Giảm thời gian
+                countdownElement.textContent = countdownTime; // Cập nhật hiển thị
+
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = '/swagger-ui/index.html'; // Chuyển hướng khi hết thời gian
+                }
+            }, 1000);
+        });
+    </script>
+
+    <style>
+        body {
+            text-align: center;
+            margin-top: 100px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<h1>WELCOME TO MY SPRINGBOOT BLOG APP BACKEND!</h1>
+<p>Moving to the API test page... <span id="countdown"></span></p>
+<h3>Test account</h3>
+<p>Email: admin@gmail.com</p>
+<p>Password: admin@gmail.com</p>
+</body>
+</html>

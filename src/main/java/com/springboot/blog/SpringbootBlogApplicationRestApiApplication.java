@@ -36,8 +36,8 @@ import java.util.Optional;
 						description = "Local server"
 				),
 				@Server(
-						url = "None",
-						description = "Aws server"
+						url = "http://blog.ap-southeast-2.elasticbeanstalk.com/",
+						description = "Aws Elastic Beanstalk server"
 				)
 		},
 		externalDocs = @ExternalDocumentation(

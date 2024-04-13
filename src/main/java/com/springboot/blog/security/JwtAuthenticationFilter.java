@@ -41,6 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    public void deleteAllCookies(HttpServletResponse response) {
+        response.addHeader(HttpHeaders.SET_COOKIE, "accessToken= " + "; Path=/; Max-Age=" + "0" + "; HttpOnly; SameSite=None; Secure");
+        response.addHeader(HttpHeaders.SET_COOKIE, "refreshToken= " + "; Path=/; Max-Age=" + "0" + "; HttpOnly; SameSite=None; Secure");
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -48,7 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        Get access and refresh token from request
         String accessToken = getAccessTokenFromRequest(request);
         String refreshToken = getRefreshTokenFromRequest(request);
-
+        // make sure have 2 tokens
+        if (accessToken == null || refreshToken == null) {
+            deleteAllCookies(response);
+            filterChain.doFilter(request, response);
+            return;
+        }
         String nameOfAccessToken = "Access Token";
 
 //        Validate access token with token provider
@@ -57,11 +66,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isAccessTokenValid.getValue0()) {
             SetAuthenticationInSecurityContext(request, accessToken);
         } else if (isAccessTokenValid.getValue1().equals(nameOfAccessToken +  " is expired")) {
-            String newAccessToken = tokenProvider.refreshAccessToken(refreshToken);
+            try {
+                String newAccessToken = tokenProvider.refreshAccessToken(refreshToken);
 
-            response.setHeader(HttpHeaders.SET_COOKIE, "accessToken=" + newAccessToken + "; Path=/; Max-Age=" + jwtExpiration + "; HttpOnly; SameSite=None; Secure");
+                response.setHeader(HttpHeaders.SET_COOKIE, "accessToken=" + newAccessToken + "; Path=/; Max-Age=" + jwtExpiration + "; HttpOnly; SameSite=None; Secure");
 
-            SetAuthenticationInSecurityContext(request, newAccessToken);
+                SetAuthenticationInSecurityContext(request, newAccessToken);
+            }
+            catch (BadRequestException e) {
+                deleteAllCookies(response);
+
+            }
+
         }
 
         filterChain.doFilter(request, response);
