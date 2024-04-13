@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/categories/")
-@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
     private CategoryService categoryService;
 

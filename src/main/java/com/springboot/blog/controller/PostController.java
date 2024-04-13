@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts/")
-@SecurityRequirement(name = "bearerAuth")
 public class PostController {
 
     private PostService postService;
