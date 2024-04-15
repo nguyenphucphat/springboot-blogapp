@@ -8,19 +8,17 @@ services:
         MYSQL_ROOT_PASSWORD: root
         MYSQL_DATABASE: blog-app
     networks:
-        springboot-mysql-net:
+        - springboot-mysql-net
 
   springboot-blog-application-rest-api:
     container_name: springboot-blog-application-rest-api
-    build:
-        context: .
-        dockerfile: Dockerfile
+    image: nguyenphucphat/springboot-blog-application-rest-api
     ports:
         - "8080:8080"
     depends_on:
         - mysqldb
     networks:
-        springboot-mysql-net:
+        - springboot-mysql-net
     restart: on-failure
 
 networks:
